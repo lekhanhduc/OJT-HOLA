@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: E-LEARNING
+
+  datasource:
+    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/banking_system
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret-key: ELN2fFMaizi8pBZNeOd51QDIM2bY1UccIpdSziPgcgSPzZ7Q7YDc5HUzewDnZpN6G7WGJZxKIqKdr3B4dIW37rwfgPYcXzrjyt2VlbmutsOsg15kQEs0No2ZHHYKLWUb2Tksu9wNuGVZkEXJ15pbRecSrOQk8t3aAxgvSyuXxOiv2vmVwx6xteH04B6C2r9Ruj8P1TTgOyIeLGX5XgPuCjNxW3e6fSMLwmSYjKR0p4F8csEolpO7YyVMlpsg4YB4
