@@ -6,7 +6,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: elearning
+      MYSQL_DATABASE: banking_system
     ports:
       - "3307:3306"
     volumes:
@@ -19,9 +19,19 @@ services:
       timeout: 5s
       retries: 5
 
-  elearning-service:
-    image: khanhduc/elearning-service:1.0.0
-    container_name: elearning
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+
+  bank-service:
+    image: khanhduc/bank-service:1.0.0
+    container_name: bank
     ports:
       - "8080:8080"
     depends_on:
@@ -41,3 +51,4 @@ networks:
 
 volumes:
   mysql_data:
+  redis_data:
