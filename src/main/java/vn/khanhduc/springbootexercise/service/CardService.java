@@ -5,13 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import vn.khanhduc.springbootexercise.common.CardStatus;
+import vn.khanhduc.springbootexercise.common.TransactionStatus;
 import vn.khanhduc.springbootexercise.dto.request.CardCreationRequest;
+import vn.khanhduc.springbootexercise.dto.request.CardDeleteRequest;
 import vn.khanhduc.springbootexercise.dto.response.CardCreationResponse;
+import vn.khanhduc.springbootexercise.dto.response.CardDetailResponse;
 import vn.khanhduc.springbootexercise.entity.Account;
 import vn.khanhduc.springbootexercise.entity.Card;
+import vn.khanhduc.springbootexercise.entity.Transaction;
 import vn.khanhduc.springbootexercise.repository.AccountRepository;
 import vn.khanhduc.springbootexercise.repository.CardRepository;
+import vn.khanhduc.springbootexercise.repository.TransactionRepository;
+import vn.khanhduc.springbootexercise.utils.SecurityUtils;
+
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -22,6 +30,7 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
     private final Random random = new Random();
 
     public CardCreationResponse createCard(CardCreationRequest request) {
@@ -62,6 +71,42 @@ public class CardService {
                 .status(card.getStatus())
                 .customerName(account.getCustomerName())
                 .build();
+    }
+
+    public List<CardDetailResponse> getCartByUserLogin() {
+        var userId = SecurityUtils.getUserLogin();
+        if(userId == null) {
+            throw new RuntimeException("Unauthenticated");
+        }
+
+        List<Card> myCart = cardRepository.findByAccountId(userId);
+
+        return myCart.stream()
+                .map(card -> CardDetailResponse.builder()
+                        .id(card.getId())
+                        .cardId(card.getCardId())
+                        .cardNumber(card.getCardNumber())
+                        .cvv(card.getCvv())
+                        .cardType(card.getCardType())
+                        .expiryDate(card.getExpiryDate())
+                        .status(card.getStatus())
+                        .customerName(card.getAccount().getCustomerName())
+                        .build()).toList();
+    }
+
+    public void deleteCard(CardDeleteRequest request) {
+        var userId = SecurityUtils.getUserLogin();
+        if(userId == null) {
+            throw new RuntimeException("Unauthenticated");
+        }
+        Card card = cardRepository.findByAccountIdAndCardId(userId, request.getId())
+                .orElseThrow(() -> new RuntimeException("Card not found"));
+
+        List<Transaction> transactions = transactionRepository.findByCardAndStatus(card, TransactionStatus.PENDING);
+        if (!transactions.isEmpty()) {
+            throw new IllegalStateException("The card cannot be removed because there is a pending transaction.");
+        }
+        cardRepository.delete(card);
     }
 
     private String generateCardNumber() {

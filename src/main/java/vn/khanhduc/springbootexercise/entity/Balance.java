@@ -39,7 +39,7 @@ public class Balance extends AbstractEntity {
 
     @Transient
     public BigDecimal getTotalBalance() {
-        return availableBalance.add(totalBalance);
+        return availableBalance.add(holdBalance);
     }
 
 }

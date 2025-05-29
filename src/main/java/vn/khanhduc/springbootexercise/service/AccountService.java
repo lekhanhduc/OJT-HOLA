@@ -11,8 +11,14 @@ import vn.khanhduc.springbootexercise.dto.response.AccountCreationResponse;
 import vn.khanhduc.springbootexercise.dto.response.AccountDetailResponse;
 import vn.khanhduc.springbootexercise.dto.response.AccountUpdateResponse;
 import vn.khanhduc.springbootexercise.entity.Account;
+import vn.khanhduc.springbootexercise.entity.Balance;
 import vn.khanhduc.springbootexercise.mapper.AccountMapper;
 import vn.khanhduc.springbootexercise.repository.AccountRepository;
+import vn.khanhduc.springbootexercise.repository.BalanceRepository;
+import vn.khanhduc.springbootexercise.repository.TransactionRepository;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -22,6 +28,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BalanceRepository balanceRepository;
 
     public AccountCreationResponse createUser(AccountCreationRequest request) {
         Optional<Account> byEmail = accountRepository.findByEmail(request.getEmail());
@@ -33,6 +40,17 @@ public class AccountService {
 
         accountRepository.save(account);
         log.info("Created account {}", account.getId());
+
+        Balance balance = Balance.builder()
+                .account(account)
+                .availableBalance(BigDecimal.ZERO)
+                .holdBalance(BigDecimal.ZERO)
+                .lastUpdated(LocalDateTime.now())
+                .build();
+
+        balanceRepository.save(balance);
+
+        log.info("Create balance record for ID account: {}", account.getId());
 
         return AccountMapper.toAccountCreationResponse(account);
     }
