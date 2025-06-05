@@ -73,8 +73,9 @@ public class AuthenticationService {
         if(signedJWT.getJWTClaimsSet().getExpirationTime().before(new Date()))
             throw new RuntimeException("Token expired time");
 
-        Optional<InvalidToken> invalidtedToken = invalidTokenRepository.findById(signedJWT.getJWTClaimsSet().getJWTID());
-        if(invalidtedToken.isPresent())
+        Optional<InvalidToken> invalidToken = invalidTokenRepository.findById(signedJWT.getJWTClaimsSet().getJWTID());
+
+        if(invalidToken.isPresent())
             throw new RuntimeException("Token expired time");
 
         String email = signedJWT.getJWTClaimsSet().getSubject();
@@ -88,4 +89,5 @@ public class AuthenticationService {
                 .accessToken(accessToken)
                 .build();
     }
+
 }

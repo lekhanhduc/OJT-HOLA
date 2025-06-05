@@ -43,6 +43,7 @@ public class JwtService {
                 .claim("authorities", authorityName)
                 .expirationTime(new Date(Instant.now().plus(30, ChronoUnit.MINUTES).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("username", account.getUsername())
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());

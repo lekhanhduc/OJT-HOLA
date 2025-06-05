@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.huythanh.springbootexercise.dto.request.BalanceUpdateRequest;
 import vn.huythanh.springbootexercise.dto.response.BalanceDetailResponse;
 import vn.huythanh.springbootexercise.dto.response.BalanceUpdateResponse;
+import vn.huythanh.springbootexercise.entity.Account;
 import vn.huythanh.springbootexercise.entity.Balance;
 import vn.huythanh.springbootexercise.mapper.BalanceMapper;
 import vn.huythanh.springbootexercise.repository.AccountRepository;
@@ -34,7 +35,10 @@ public class BalanceService {
             throw new RuntimeException("Unauthenticated");
         }
 
-        var balance = balanceRepository.findByAccountId(userId)
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        Balance balance = balanceRepository.findByAccount(account)
                 .orElseThrow(() -> new RuntimeException("Balance not found"));
 
         return BalanceDetailResponse.builder()
@@ -60,10 +64,10 @@ public class BalanceService {
             throw new IllegalArgumentException("The amount added must be greater than 0.");
         }
 
-        accountRepository.findById(userId)
+        Account account = accountRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        Balance balance = balanceRepository.findByAccountId(userId)
+        Balance balance = balanceRepository.findByAccount(account)
                 .orElseThrow(() -> new RuntimeException("Balance not found"));
 
         balance.setAvailableBalance(balance.getAvailableBalance().add(request.getAmount()));
@@ -89,10 +93,10 @@ public class BalanceService {
             throw new IllegalArgumentException("Withdrawal amount must be greater than 0.");
         }
 
-        accountRepository.findById(userId)
+        Account account = accountRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        Balance balance = balanceRepository.findByAccountId(userId)
+        Balance balance = balanceRepository.findByAccount(account)
                 .orElseThrow(() -> new RuntimeException("Balance not found"));
 
         if (balance.getAvailableBalance().compareTo(request.getAmount()) < 0) {

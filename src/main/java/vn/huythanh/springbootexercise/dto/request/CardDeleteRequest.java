@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CardDeleteRequest {
-    private Long id;
+    private String cardId;
 }

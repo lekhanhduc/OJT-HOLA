@@ -19,4 +19,5 @@ public class AuditorAwareConfiguration implements AuditorAware<String> {
         }
         return Optional.of("anonymous user");
     }
+
 }

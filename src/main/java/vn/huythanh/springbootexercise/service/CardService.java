@@ -99,7 +99,7 @@ public class CardService {
         if(userId == null) {
             throw new RuntimeException("Unauthenticated");
         }
-        Card card = cardRepository.findByAccountIdAndCardId(userId, request.getId())
+        Card card = cardRepository.findByAccountIdAndCardId(userId, request.getCardId())
                 .orElseThrow(() -> new RuntimeException("Card not found"));
 
         List<Transaction> transactions = transactionRepository.findByCardAndStatus(card, TransactionStatus.PENDING);

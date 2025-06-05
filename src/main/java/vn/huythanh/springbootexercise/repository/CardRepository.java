@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findByAccountId(Long accountId);
 
-    @Query("select c from Card c where c.account.id=:accountId and c.cardId=:cardId")
-    Optional<Card> findByAccountIdAndCardId(Long accountId, Long cardId);
+    @Query("select c from Card c where c.account.id = :accountId and c.cardId = :cardId")
+    Optional<Card> findByAccountIdAndCardId(Long accountId, String cardId);
+
 }
