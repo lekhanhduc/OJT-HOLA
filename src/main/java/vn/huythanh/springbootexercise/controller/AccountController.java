@@ -42,4 +42,13 @@ public class AccountController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    ApiResponse<Void> deleteAccount(@PathVariable Long id) {
+        accountService.deleteAccount(id);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Account deleted")
+                .build();
+    }
+
 }

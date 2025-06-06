@@ -14,9 +14,11 @@ import vn.huythanh.springbootexercise.dto.response.AccountDetailResponse;
 import vn.huythanh.springbootexercise.dto.response.AccountUpdateResponse;
 import vn.huythanh.springbootexercise.entity.Account;
 import vn.huythanh.springbootexercise.entity.Balance;
+import vn.huythanh.springbootexercise.entity.Card;
 import vn.huythanh.springbootexercise.mapper.AccountMapper;
 import vn.huythanh.springbootexercise.repository.AccountRepository;
 import vn.huythanh.springbootexercise.repository.BalanceRepository;
+import vn.huythanh.springbootexercise.repository.CardRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,6 +32,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final BalanceRepository balanceRepository;
+    private final CardRepository cardRepository;
 
     public AccountCreationResponse createUser(AccountCreationRequest request) {
         Optional<Account> byEmail = accountRepository.findByEmail(request.getEmail());
@@ -110,6 +113,21 @@ public class AccountService {
                         .createdAt(account.getCreatedAt())
                         .build())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
+    }
+
+    public void deleteAccount(Long id) {
+        log.info("Delete account {}", id);
+        var account = accountRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        var cards = cardRepository.findByAccountId(account.getId());
+        var balance = balanceRepository.findByAccount(account).orElseThrow(() -> new RuntimeException("Balance not found"));
+
+        if(cards.isEmpty() && balance.getTotalBalance().equals(BigDecimal.ZERO)) {
+            accountRepository.delete(account);
+        } else {
+            throw new RuntimeException("Unable to delete account");
+        }
     }
 
 }
