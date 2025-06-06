@@ -6,4 +6,5 @@ import java.math.BigDecimal;
 @Data
 public class BalanceUpdateRequest {
     private BigDecimal amount;
+    private String CardNumber;
 }
